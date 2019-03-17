@@ -36,6 +36,7 @@ function fetchQuery(
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+// TODO: Set session token properly when user is logged in
       'X-Parse-Session-Token': 'r:02314d1a523369507e73e74f04bdf134'
     },
     body: JSON.stringify({
