@@ -22,7 +22,7 @@ const mutation = graphql`
         id
         complete
       }
-      viewer {
+      user {
         id
         completedCount
       }

@@ -1,24 +1,156 @@
+input _UserPointerInput {
+  """pointer's objectId"""
+  objectId: ID!
+
+  """pointer's className"""
+  className: String = "_User"
+}
+
+scalar ACL
+
+"""Parse Class _Role Input"""
+input AddRoleInput {
+  """Setter for ACL (ACL)"""
+  ACL: ACL
+
+  """Setter for name (String)"""
+  name: String
+  clientMutationId: String
+}
+
+"""Parse Class _Session Input"""
+input AddSessionInput {
+  """Setter for ACL (ACL)"""
+  ACL: ACL
+
+  """Setter for restricted (Boolean)"""
+  restricted: Boolean
+
+  """Setter for user (Pointer)"""
+  user: _UserPointerInput
+
+  """Setter for installationId (String)"""
+  installationId: String
+
+  """Setter for sessionToken (String)"""
+  sessionToken: String
+
+  """Setter for expiresAt (Date)"""
+  expiresAt: Date
+  clientMutationId: String
+}
+
+"""Parse Class Todo Input"""
 input AddTodoInput {
-  text: String!
+  """Setter for ACL (ACL)"""
+  ACL: ACL
+
+  """Setter for text (String)"""
+  text: String
+
+  """Setter for complete (Boolean)"""
+  complete: Boolean
+
+  """Setter for user (Pointer)"""
+  user: _UserPointerInput
   clientMutationId: String
 }
 
-type AddTodoPayload {
-  todoEdge: TodoEdge
-  viewer: User
+"""Parse Class _User Input"""
+input AddUserInput {
+  """The session token for the user, set only when it makes sense."""
+  sessionToken: String
+
+  """Setter for ACL (ACL)"""
+  ACL: ACL
+
+  """Setter for username (String)"""
+  username: String
+
+  """Setter for password (String)"""
+  password: String
+
+  """Setter for email (String)"""
+  email: String
+
+  """Setter for emailVerified (Boolean)"""
+  emailVerified: Boolean
+
+  """Setter for totalCount (Number)"""
+  totalCount: NumberInput
+
+  """Setter for completedCount (Number)"""
+  completedCount: NumberInput
   clientMutationId: String
 }
 
-input ChangeTodoStatusInput {
-  complete: Boolean!
-  id: ID!
+scalar Date
+
+input DateQuery {
+  """Test for equality"""
+  eq: Date
+
+  """Test for non equality"""
+  neq: Date
+
+  """Test that the object is contained in"""
+  in: [Date]
+  nin: [Date]
+  exists: Boolean
+  lt: Date
+  gt: Date
+  lte: Date
+  gte: Date
+}
+
+input DestroyRoleInput {
+  """Use either the global id or objectId"""
+  id: ID
+
+  """Use either the global id or objectId"""
+  objectId: ID
   clientMutationId: String
 }
 
-type ChangeTodoStatusPayload {
-  todo: Todo
-  viewer: User
+input DestroySessionInput {
+  """Use either the global id or objectId"""
+  id: ID
+
+  """Use either the global id or objectId"""
+  objectId: ID
   clientMutationId: String
+}
+
+input DestroyTodoInput {
+  """Use either the global id or objectId"""
+  id: ID
+
+  """Use either the global id or objectId"""
+  objectId: ID
+  clientMutationId: String
+}
+
+input DestroyUserInput {
+  """Use either the global id or objectId"""
+  id: ID
+
+  """Use either the global id or objectId"""
+  objectId: ID
+  clientMutationId: String
+}
+
+"""
+The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSON
+
+input LoginInput {
+  """the email of the user. Either email or username should be provided"""
+  email: String
+
+  """the username of the user. Either email or username should be provided"""
+  username: String
+  password: String!
 }
 
 input MarkAllTodosInput {
@@ -28,48 +160,125 @@ input MarkAllTodosInput {
 
 type MarkAllTodosPayload {
   changedTodos: [Todo]
-  viewer: User
+  user: User
   clientMutationId: String
 }
 
 type Mutation {
-  addTodo(input: AddTodoInput!): AddTodoPayload
-  changeTodoStatus(input: ChangeTodoStatusInput!): ChangeTodoStatusPayload
-  markAllTodos(input: MarkAllTodosInput!): MarkAllTodosPayload
-  removeCompletedTodos(input: RemoveCompletedTodosInput!): RemoveCompletedTodosPayload
-  removeTodo(input: RemoveTodoInput!): RemoveTodoPayload
-  renameTodo(input: RenameTodoInput!): RenameTodoPayload
+  login(input: LoginInput): User
+  logout: Boolean
+
+  """use this method to create a new _Role"""
+  addRole(input: AddRoleInput): RoleMutationCompletePayload
+
+  """use this method to update an existing _Role"""
+  updateRole(input: UpdateRoleInput): RoleMutationCompletePayload
+
+  """use this method to update delete an existing _Role"""
+  destroyRole(input: DestroyRoleInput): RoleMutationCompletePayload
+
+  """use this method to create a new _User"""
+  addUser(input: AddUserInput): UserMutationCompletePayload
+
+  """use this method to update an existing _User"""
+  updateUser(input: UpdateUserInput): UserMutationCompletePayload
+
+  """use this method to update delete an existing _User"""
+  destroyUser(input: DestroyUserInput): UserMutationCompletePayload
+
+  """use this method to create a new _Session"""
+  addSession(input: AddSessionInput): SessionMutationCompletePayload
+
+  """use this method to update an existing _Session"""
+  updateSession(input: UpdateSessionInput): SessionMutationCompletePayload
+
+  """use this method to update delete an existing _Session"""
+  destroySession(input: DestroySessionInput): SessionMutationCompletePayload
+
+  """use this method to create a new Todo"""
+  addTodo(input: AddTodoInput): TodoMutationCompletePayload
+
+  """use this method to update an existing Todo"""
+  updateTodo(input: UpdateTodoInput): TodoMutationCompletePayload
+
+  """use this method to update delete an existing Todo"""
+  destroyTodo(input: DestroyTodoInput): TodoMutationCompletePayload
+
+  """Calling this mutation will run the cloud function"""
+  markAllTodos(input: MarkAllTodosInput): MarkAllTodosPayload
+
+  """Calling this mutation will run the cloud function"""
+  removeCompletedTodos(input: RemoveCompletedTodosInput): RemoveCompletedTodosPayload
 }
 
-"""An object with an ID"""
 interface Node {
-  """The id of the object."""
   id: ID!
+}
+
+"""
+Input for number
+  Supported schemas:
+
+  - key: 1
+  - key: {increment: 1}
+  
+"""
+scalar NumberInput
+
+input NumberQuery {
+  """Test for equality"""
+  eq: Float
+
+  """Test for non equality"""
+  neq: Float
+
+  """Test that the object is contained in"""
+  in: [Float]
+  nin: [Float]
+  exists: Boolean
+  lt: Float
+  gt: Float
+  lte: Float
+  gte: Float
 }
 
 """Information about pagination in a connection."""
 type PageInfo {
-  """When paginating forwards, are there more items?"""
   hasNextPage: Boolean!
-
-  """When paginating backwards, are there more items?"""
   hasPreviousPage: Boolean!
-
-  """When paginating backwards, the cursor to continue."""
   startCursor: String
-
-  """When paginating forwards, the cursor to continue."""
   endCursor: String
 }
 
+"""The query root of you Parse Server's graphQL interface"""
 type Query {
-  viewer: User
+  """Common endpoint"""
+  node(id: ID!): Node
+  currentUser: User
 
-  """Fetches an object given its ID"""
-  node(
-    """The ID of an object"""
-    id: ID!
-  ): Node
+  """Use this endpoint to get or query _Role objects"""
+  Role(objectId: ID): Role
+
+  """Use this endpoint to get or query _Role objects"""
+  findRole(where: RoleQuery, first: Int, last: Int, after: String, before: String): RoleQueryConnection
+
+  """Use this endpoint to get or query _User objects"""
+  User(objectId: ID): User
+
+  """Use this endpoint to get or query _User objects"""
+  findUser(where: UserQuery, first: Int, last: Int, after: String, before: String): UserQueryConnection
+
+  """Use this endpoint to get or query _Session objects"""
+  Session(objectId: ID): Session
+
+  """Use this endpoint to get or query _Session objects"""
+  findSession(where: SessionQuery, first: Int, last: Int, after: String, before: String): SessionQueryConnection
+
+  """Use this endpoint to get or query Todo objects"""
+  Todo(objectId: ID): Todo
+
+  """Use this endpoint to get or query Todo objects"""
+  findTodo(where: TodoQuery, first: Int, last: Int, after: String, before: String): TodoQueryConnection
 }
 
 input RemoveCompletedTodosInput {
@@ -77,62 +286,388 @@ input RemoveCompletedTodosInput {
 }
 
 type RemoveCompletedTodosPayload {
-  deletedTodoIds: [String]
-  viewer: User
+  removedTodos: [Todo]
+  user: User
   clientMutationId: String
 }
 
-input RemoveTodoInput {
+"""Parse Class _Role"""
+type Role implements Node {
+  """A globaly unique identifier."""
   id: ID!
+
+  """Accessor for objectId (String)"""
+  objectId: ID!
+
+  """Accessor for createdAt (Date)"""
+  createdAt: Date
+
+  """Accessor for updatedAt (Date)"""
+  updatedAt: Date
+
+  """Accessor for ACL (ACL)"""
+  ACL: ACL
+
+  """Accessor for name (String)"""
+  name: String
+
+  """Use this endpoint to get or query _User objects"""
+  users(where: UserQuery, first: Int, last: Int, after: String, before: String): UserQueryConnection
+
+  """Use this endpoint to get or query _Role objects"""
+  roles(where: RoleQuery, first: Int, last: Int, after: String, before: String): RoleQueryConnection
+}
+
+type RoleEdge {
+  node: Role
+  cursor: String
+}
+
+type RoleMutationCompletePayload {
+  object: Role
   clientMutationId: String
 }
 
-type RemoveTodoPayload {
-  deletedTodoId: ID
-  viewer: User
-  clientMutationId: String
+"""Parse Class _Role Query"""
+input RoleQuery {
+  """Query for createdAt (Date)"""
+  createdAt: DateQuery
+
+  """Query for updatedAt (Date)"""
+  updatedAt: DateQuery
+
+  """Query for name (String)"""
+  name: StringQuery
 }
 
-input RenameTodoInput {
+type RoleQueryConnection {
+  nodes: [Role]
+  edges: [RoleEdge]
+  pageInfo: PageInfo
+}
+
+"""Parse Class _Session"""
+type Session implements Node {
+  """A globaly unique identifier."""
   id: ID!
-  text: String!
+
+  """Accessor for objectId (String)"""
+  objectId: ID!
+
+  """Accessor for createdAt (Date)"""
+  createdAt: Date
+
+  """Accessor for updatedAt (Date)"""
+  updatedAt: Date
+
+  """Accessor for ACL (ACL)"""
+  ACL: ACL
+
+  """Accessor for restricted (Boolean)"""
+  restricted: Boolean
+
+  """Accessor for user (Pointer<_User>)"""
+  user: User
+
+  """Accessor for installationId (String)"""
+  installationId: String
+
+  """Accessor for sessionToken (String)"""
+  sessionToken: String
+
+  """Accessor for expiresAt (Date)"""
+  expiresAt: Date
+
+  """Accessor for createdWith (Object)"""
+  createdWith: JSON
+}
+
+type SessionEdge {
+  node: Session
+  cursor: String
+}
+
+type SessionMutationCompletePayload {
+  object: Session
   clientMutationId: String
 }
 
-type RenameTodoPayload {
-  todo: Todo
-  clientMutationId: String
+"""Parse Class _Session Query"""
+input SessionQuery {
+  """Query for createdAt (Date)"""
+  createdAt: DateQuery
+
+  """Query for updatedAt (Date)"""
+  updatedAt: DateQuery
+
+  """Query for restricted (Boolean)"""
+  restricted: Boolean
+
+  """Query for user (Pointer)"""
+  user: UserQuery
+
+  """Query for installationId (String)"""
+  installationId: StringQuery
+
+  """Query for sessionToken (String)"""
+  sessionToken: StringQuery
+
+  """Query for expiresAt (Date)"""
+  expiresAt: DateQuery
 }
 
+type SessionQueryConnection {
+  nodes: [Session]
+  edges: [SessionEdge]
+  pageInfo: PageInfo
+}
+
+input StringQuery {
+  """Test for equality"""
+  eq: String
+
+  """Test for non equality"""
+  neq: String
+
+  """Test that the object is contained in"""
+  in: [String]
+  nin: [String]
+  exists: Boolean
+  regex: String
+}
+
+"""Parse Class Todo"""
 type Todo implements Node {
-  """The ID of an object"""
+  """A globaly unique identifier."""
   id: ID!
+
+  """Accessor for objectId (String)"""
+  objectId: ID!
+
+  """Accessor for createdAt (Date)"""
+  createdAt: Date
+
+  """Accessor for updatedAt (Date)"""
+  updatedAt: Date
+
+  """Accessor for ACL (ACL)"""
+  ACL: ACL
+
+  """Accessor for text (String)"""
   text: String
+
+  """Accessor for complete (Boolean)"""
   complete: Boolean
+
+  """Accessor for user (Pointer<_User>)"""
+  user: User
 }
 
-"""A connection to a list of items."""
-type TodoConnection {
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """A list of edges."""
-  edges: [TodoEdge]
-}
-
-"""An edge in a connection."""
 type TodoEdge {
-  """The item at the end of the edge"""
   node: Todo
-
-  """A cursor for use in pagination"""
-  cursor: String!
+  cursor: String
 }
 
+type TodoMutationCompletePayload {
+  object: Todo
+  clientMutationId: String
+}
+
+"""Parse Class Todo Query"""
+input TodoQuery {
+  """Query for createdAt (Date)"""
+  createdAt: DateQuery
+
+  """Query for updatedAt (Date)"""
+  updatedAt: DateQuery
+
+  """Query for text (String)"""
+  text: StringQuery
+
+  """Query for complete (Boolean)"""
+  complete: Boolean
+
+  """Query for user (Pointer)"""
+  user: UserQuery
+}
+
+type TodoQueryConnection {
+  nodes: [Todo]
+  edges: [TodoEdge]
+  pageInfo: PageInfo
+}
+
+"""Parse Class _Role Update"""
+input UpdateRoleInput {
+  """Setter for ACL (ACL)"""
+  ACL: ACL
+
+  """Setter for name (String)"""
+  name: String
+  id: ID
+  objectId: ID
+  clientMutationId: String
+}
+
+"""Parse Class _Session Update"""
+input UpdateSessionInput {
+  """Setter for ACL (ACL)"""
+  ACL: ACL
+
+  """Setter for restricted (Boolean)"""
+  restricted: Boolean
+
+  """Setter for user (Pointer)"""
+  user: _UserPointerInput
+
+  """Setter for installationId (String)"""
+  installationId: String
+
+  """Setter for sessionToken (String)"""
+  sessionToken: String
+
+  """Setter for expiresAt (Date)"""
+  expiresAt: Date
+  id: ID
+  objectId: ID
+  clientMutationId: String
+}
+
+"""Parse Class Todo Update"""
+input UpdateTodoInput {
+  """Setter for ACL (ACL)"""
+  ACL: ACL
+
+  """Setter for text (String)"""
+  text: String
+
+  """Setter for complete (Boolean)"""
+  complete: Boolean
+
+  """Setter for user (Pointer)"""
+  user: _UserPointerInput
+  id: ID
+  objectId: ID
+  clientMutationId: String
+}
+
+"""Parse Class _User Update"""
+input UpdateUserInput {
+  """The session token for the user, set only when it makes sense."""
+  sessionToken: String
+
+  """Setter for ACL (ACL)"""
+  ACL: ACL
+
+  """Setter for username (String)"""
+  username: String
+
+  """Setter for password (String)"""
+  password: String
+
+  """Setter for email (String)"""
+  email: String
+
+  """Setter for emailVerified (Boolean)"""
+  emailVerified: Boolean
+
+  """Setter for totalCount (Number)"""
+  totalCount: NumberInput
+
+  """Setter for completedCount (Number)"""
+  completedCount: NumberInput
+  id: ID
+  objectId: ID
+  clientMutationId: String
+}
+
+"""Parse Class _User"""
 type User implements Node {
-  """The ID of an object"""
+  """A globaly unique identifier."""
   id: ID!
-  todos(status: String = "any", after: String, first: Int, before: String, last: Int): TodoConnection
-  totalCount: Int
-  completedCount: Int
+
+  """The session token for the user, set only when it makes sense."""
+  sessionToken: String
+
+  """Accessor for objectId (String)"""
+  objectId: ID!
+
+  """Accessor for createdAt (Date)"""
+  createdAt: Date
+
+  """Accessor for updatedAt (Date)"""
+  updatedAt: Date
+
+  """Accessor for ACL (ACL)"""
+  ACL: ACL
+
+  """Accessor for username (String)"""
+  username: String
+
+  """Accessor for password (String)"""
+  password: String
+
+  """Accessor for email (String)"""
+  email: String
+
+  """Accessor for emailVerified (Boolean)"""
+  emailVerified: Boolean
+
+  """Accessor for authData (Object)"""
+  authData: JSON
+
+  """Use this endpoint to get or query Todo objects"""
+  todos(where: TodoQuery, first: Int, last: Int, after: String, before: String): TodoQueryConnection
+
+  """Accessor for totalCount (Number)"""
+  totalCount: Float
+
+  """Accessor for completedCount (Number)"""
+  completedCount: Float
+}
+
+type UserEdge {
+  node: User
+  cursor: String
+}
+
+type UserMutationCompletePayload {
+  object: User
+  clientMutationId: String
+}
+
+"""Parse Class _User Query"""
+input UserQuery {
+  """The session token for the user, set only when it makes sense."""
+  sessionToken: String
+
+  """Query for createdAt (Date)"""
+  createdAt: DateQuery
+
+  """Query for updatedAt (Date)"""
+  updatedAt: DateQuery
+
+  """Query for username (String)"""
+  username: StringQuery
+
+  """Query for password (String)"""
+  password: StringQuery
+
+  """Query for email (String)"""
+  email: StringQuery
+
+  """Query for emailVerified (Boolean)"""
+  emailVerified: Boolean
+
+  """Query for totalCount (Number)"""
+  totalCount: NumberQuery
+
+  """Query for completedCount (Number)"""
+  completedCount: NumberQuery
+}
+
+type UserQueryConnection {
+  nodes: [User]
+  edges: [UserEdge]
+  pageInfo: PageInfo
 }

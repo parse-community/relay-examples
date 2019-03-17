@@ -1,7 +1,7 @@
 {
   "private": true,
   "scripts": {
-    "start": "babel-node ./server.js",
+    "start": "babel-node --inspect=9230 ./server.js",
     "build": "relay-compiler --src ./js/ --schema ./data/schema.graphql",
     "update-schema": "babel-node ./scripts/updateSchema.js"
   },
@@ -17,8 +17,10 @@
     "classnames": "2.2.6",
     "express": "^4.16.3",
     "express-graphql": "^0.6.12",
+    "get-graphql-schema": "^2.1.1",
     "graphql": "^0.13.2",
     "graphql-relay": "^0.5.5",
+    "parse-server": "git+https://github.com/parse-community/parse-server.git#graphql",
     "prop-types": "^15.6.2",
     "react": "^16.4.2",
     "react-dom": "^16.4.2",

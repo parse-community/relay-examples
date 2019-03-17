@@ -19,18 +19,15 @@ import {ConnectionHandler} from 'relay-runtime';
 const mutation = graphql`
   mutation AddTodoMutation($input: AddTodoInput!) {
     addTodo(input:$input) {
-      todoEdge {
+      object {
         __typename
-        cursor
-        node {
-          complete
-          id
-          text
-        }
-      }
-      viewer {
+        complete
         id
-        totalCount
+        text
+        user {
+          id
+          totalCount
+        }
       }
     }
   }
@@ -63,9 +60,14 @@ function commit(
         },
       },
       updater: (store) => {
+        // Add todo returns a simple object
+        // We need to wrap it into an edge so it's possible 
+        // To use it correctly
         const payload = store.getRootField('addTodo');
-        const newEdge = payload.getLinkedRecord('todoEdge');
-        sharedUpdater(store, user, newEdge);
+        const node = store.create('server:edge:' + payload.getDataID(), 'TodoEdge');
+        const object = payload.getLinkedRecord('object');
+        node.setLinkedRecord(object, 'node');
+        sharedUpdater(store, user, node);
       },
       optimisticUpdater: (store) => {
         const id = 'client:newTodo:' + tempID++;

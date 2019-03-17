@@ -32,10 +32,11 @@ function fetchQuery(
   operation,
   variables,
 ) {
-  return fetch('/graphql', {
+  return fetch('/parse/graphql', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      'X-Parse-Session-Token': 'r:02314d1a523369507e73e74f04bdf134'
     },
     body: JSON.stringify({
       query: operation.text,
@@ -56,7 +57,7 @@ ReactDOM.render(
     environment={modernEnvironment}
     query={graphql`
       query appQuery {
-        viewer {
+        user: currentUser {
           ...TodoApp_viewer
         }
       }
@@ -64,7 +65,7 @@ ReactDOM.render(
     variables={{}}
     render={({error, props}) => {
       if (props) {
-        return <TodoApp viewer={props.viewer} />;
+        return <TodoApp viewer={props.user} />;
       } else {
         return <div>Loading</div>;
       }

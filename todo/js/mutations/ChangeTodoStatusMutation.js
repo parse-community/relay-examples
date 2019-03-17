@@ -16,15 +16,15 @@ import {
 } from 'react-relay';
 
 const mutation = graphql`
-  mutation ChangeTodoStatusMutation($input: ChangeTodoStatusInput!) {
-    changeTodoStatus(input: $input) {
-      todo {
+  mutation ChangeTodoStatusMutation($input: UpdateTodoInput!) {
+    updateTodo(input: $input) {
+      object {
         id
         complete
-      }
-      viewer {
-        id
-        completedCount
+        user {
+          id
+          completedCount
+        }
       }
     }
   }
@@ -38,12 +38,12 @@ function getOptimisticResponse(complete, todo, user) {
       user.completedCount - 1;
   }
   return {
-    changeTodoStatus: {
-      todo: {
+    updateTodo: {
+      object: {
         complete: complete,
         id: todo.id,
+        user: viewerPayload,
       },
-      viewer: viewerPayload,
     },
   };
 }

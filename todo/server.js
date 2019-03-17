@@ -11,13 +11,12 @@
  */
 
 import express from 'express';
-import graphQLHTTP from 'express-graphql';
 import path from 'path';
 import webpack from 'webpack';
 import WebpackDevServer from 'webpack-dev-server';
-import {schema} from './data/schema';
+import parseServer from './parseServer';
 
-const APP_PORT = 3000;
+const APP_PORT = process.env.port || 3000;
 
 // Serve the Relay app
 const compiler = webpack({
@@ -50,12 +49,7 @@ const app = new WebpackDevServer(compiler, {
 
 // Serve static resources
 app.use('/', express.static(path.resolve(__dirname, 'public')));
-
-// Setup GraphQL endpoint
-app.use('/graphql', graphQLHTTP({
-  schema: schema,
-  pretty: true,
-}));
+app.use('/parse', parseServer.app);
 
 app.listen(APP_PORT, () => {
   console.log(`App is now running on http://localhost:${APP_PORT}`);

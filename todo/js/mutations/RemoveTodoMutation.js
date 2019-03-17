@@ -17,12 +17,14 @@ import {
 import {ConnectionHandler} from 'relay-runtime';
 
 const mutation = graphql`
-  mutation RemoveTodoMutation($input: RemoveTodoInput!) {
-    removeTodo(input: $input) {
-      deletedTodoId,
-      viewer {
-        completedCount,
-        totalCount,
+  mutation RemoveTodoMutation($input: DestroyTodoInput!) {
+    destroyTodo(input: $input) {
+      object {
+        id
+        user {
+          completedCount,
+          totalCount,
+        },
       },
     }
   }
@@ -53,8 +55,9 @@ function commit(
         input: {id: todo.id},
       },
       updater: (store) => {
-        const payload = store.getRootField('removeTodo');
-        sharedUpdater(store, user, payload.getValue('deletedTodoId'));
+        const payload = store.getRootField('destroyTodo');
+        const deletedTodo = payload.getLinkedRecord('object').getValue('id');
+        sharedUpdater(store, user, deletedTodo);
       },
       optimisticUpdater: (store) => {
         sharedUpdater(store, user, todo.id);

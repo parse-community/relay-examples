@@ -19,8 +19,10 @@ import {ConnectionHandler} from 'relay-runtime';
 const mutation = graphql`
   mutation RemoveCompletedTodosMutation($input: RemoveCompletedTodosInput!) {
     removeCompletedTodos(input: $input) {
-      deletedTodoIds,
-      viewer {
+      removedTodos {
+        id
+      },
+      user {
         completedCount,
         totalCount,
       },
@@ -28,14 +30,14 @@ const mutation = graphql`
   }
 `;
 
-function sharedUpdater(store, user, deletedIDs) {
+function sharedUpdater(store, user, deletedNodes) {
   const userProxy = store.get(user.id);
   const conn = ConnectionHandler.getConnection(
     userProxy,
     'TodoList_todos',
   );
-  deletedIDs.forEach((deletedID) =>
-    ConnectionHandler.deleteNode(conn, deletedID)
+  deletedNodes.forEach((node) =>
+    ConnectionHandler.deleteNode(conn, node.id)
   );
 }
 
@@ -53,13 +55,15 @@ function commit(
       },
       updater: (store) => {
         const payload = store.getRootField('removeCompletedTodos');
-        sharedUpdater(store, user, payload.getValue('deletedTodoIds'));
+        sharedUpdater(store, user, payload.getLinkedRecords('removedTodos').map((record) => ({
+          id: record.getValue('id')
+        })));
       },
       optimisticUpdater: (store) => {
         if (todos && todos.edges) {
           const deletedIDs = todos.edges
             .filter(edge => edge.node.complete)
-            .map(edge => edge.node.id);
+            .map(edge => edge.node);
           sharedUpdater(store, user, deletedIDs);
         }
       },

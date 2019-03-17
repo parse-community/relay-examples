@@ -16,9 +16,9 @@ import {
 } from 'react-relay';
 
 const mutation = graphql`
-  mutation RenameTodoMutation($input: RenameTodoInput!) {
-    renameTodo(input:$input) {
-      todo {
+  mutation RenameTodoMutation($input: UpdateTodoInput!) {
+    updateTodo(input:$input) {
+      object {
         id
         text
       }
@@ -28,8 +28,8 @@ const mutation = graphql`
 
 function getOptimisticResponse(text, todo) {
   return {
-    renameTodo: {
-      todo: {
+    updateTodo: {
+      object: {
         id: todo.id,
         text: text,
       },
