@@ -33,6 +33,6 @@
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
-    "relay-compiler": "^1.7.0-rc.1"
+    "relay-compiler": "^20.1.1"
   }
 }
